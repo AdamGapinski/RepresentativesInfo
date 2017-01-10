@@ -1,20 +1,16 @@
 package com.adam58.model;
 
-import com.google.gson.Gson;
-
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * @author Adam Gapiński
  */
 public class RepresentativesDataModel implements IRepresentativesDataModel {
+    List<Representative> representatives = new CopyOnWriteArrayList<>();
+
     @Override
     public Representative getRep(String name) {
-        name = name.toUpperCase();
-
-        Gson gson = new Gson();
-
-
         return null;
     }
 
