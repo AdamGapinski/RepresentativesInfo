@@ -49,6 +49,7 @@ public class FetchRepresentativesFromWebApi implements IFetchRepresentativesData
 
     private BufferedReader getJsonBufferedReader(int id) throws IOException {
         String urlString = new StringBuilder()
+                .append(webApiUrl)
                 .append("poslowie/")
                 .append(id)
                 .append(".json")
@@ -57,27 +58,29 @@ public class FetchRepresentativesFromWebApi implements IFetchRepresentativesData
                 .toString();
 
         URL url = new URL(urlString);
-        Object content = url.getContent();
-
-        InputStream contentStream = null;
-        if (content instanceof InputStream) {
-            contentStream = (InputStream) content;
-        }
+        InputStream contentStream = (InputStream) url.getContent();
 
         return new BufferedReader(new InputStreamReader(contentStream));
     }
 }
 
 class RepresentativeDTO {
-    @SerializedName("poslowie.imie_pierwsze")
-    public String name;
+    class Data {
+        @SerializedName("poslowie.imie_pierwsze")
+        public String name;
 
-    @SerializedName("poslowie.imie_drugie")
-    public String secondName;
+        @SerializedName("poslowie.imie_drugie")
+        public String secondName;
 
-    @SerializedName("poslowie.nazwisko")
-    public String surname;
+        @SerializedName("poslowie.nazwisko")
+        public String surname;
 
+        @SerializedName("poslowie.kadencja")
+        public List<Integer> termOfOffice;
+    }
+
+    @SerializedName("data")
+    public Data data;
 
     class Layers {
         class Expenses {
