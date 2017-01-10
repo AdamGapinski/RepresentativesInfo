@@ -9,6 +9,7 @@ import java.util.List;
 public class Representative {
     private String name;
     private String surname;
+    private String secondName;
 
     private double totalExpenses;
     private double minorRenovationExpenses;
@@ -17,6 +18,10 @@ public class Representative {
     private List<BusinessTrip> trips = new ArrayList<>();
 
     public Representative(RepresentativeDTO representativeDTO) {
+        this.name = representativeDTO.data.name;
+        this.secondName = representativeDTO.data.secondName;
+        this.surname = representativeDTO.data.surname;
 
+        this.termsOfOffice = representativeDTO.data.termOfOffice;
     }
 }
