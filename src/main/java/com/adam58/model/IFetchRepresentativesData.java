@@ -7,6 +7,5 @@ import java.util.List;
  */
 public interface IFetchRepresentativesData {
     List<Representative> fetchRepresentativesByTermOfOffice(int termOfOffice);
-    List<Representative> fetchAllRepresentatives();
-    Representative fetchRepresentativeByName(String name, String surname);
+    Representative fetchRepresentativeByName(int termOfOffice, String names, String surname) throws Exception;
 }
