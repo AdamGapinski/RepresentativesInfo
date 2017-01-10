@@ -15,4 +15,8 @@ public class Representative {
 
     private List<Integer> termsOfOffice = new ArrayList<>();
     private List<BusinessTrip> trips = new ArrayList<>();
+
+    public Representative(RepresentativeDTO representativeDTO) {
+
+    }
 }
