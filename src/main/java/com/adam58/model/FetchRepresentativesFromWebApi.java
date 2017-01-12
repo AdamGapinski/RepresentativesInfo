@@ -1,6 +1,6 @@
 package com.adam58.model;
 
-import com.google.gson.Gson;
+import com.google.gson.*;
 import com.google.gson.annotations.SerializedName;
 
 import java.io.BufferedReader;
@@ -8,6 +8,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutorService;
@@ -125,17 +127,102 @@ public class FetchRepresentativesFromWebApi implements IFetchRepresentativesData
 
     private Representative fetchRepresentative(int id) throws IOException {
         BufferedReader jsonReader = getJsonBufferedReaderForId(id);
-
         String line;
-        RepresentativeDTO dto = null;
 
-        while((line = jsonReader.readLine()) != null) {
-            Gson gson = new Gson();
-            dto = gson.fromJson(line, RepresentativeDTO.class);
+        Representative representative = null;
+
+        if ((line = jsonReader.readLine()) != null) {
+            representative = parseJsonToRepresentative(line);
         }
 
-        return new Representative(dto);
+        return representative;
     }
+
+    private Representative parseJsonToRepresentative(String line) {
+        Representative representative = new Representative();
+
+        JsonElement jsonElement = new JsonParser().parse(line);
+
+        JsonObject jsonObject = jsonElement.getAsJsonObject();
+        JsonObject data = jsonObject.getAsJsonObject("data");
+        representative.setName(data.getAsJsonPrimitive("poslowie.imie_pierwsze").getAsString());
+        representative.setSecondName(data.getAsJsonPrimitive("poslowie.imie_drugie").getAsString());
+        representative.setNames(data.getAsJsonPrimitive("poslowie.imiona").getAsString());
+        representative.setSurname(data.getAsJsonPrimitive("poslowie.nazwisko").getAsString());
+        representative.setBusinessTripsCount(data.getAsJsonPrimitive("poslowie.liczba_wyjazdow").getAsInt());
+        representative.setTotalBusinessTripsExpense(data.getAsJsonPrimitive("poslowie.wartosc_wyjazdow")
+                .getAsDouble());
+
+
+        List<Integer> termsOfOffice = new ArrayList<>();
+
+        for (JsonElement e : data.getAsJsonArray("poslowie.kadencja")) {
+            termsOfOffice.add(e.getAsInt());
+        }
+
+        representative.setTermsOfOffice(termsOfOffice);
+
+        JsonObject layers = jsonObject.getAsJsonObject("layers");
+        JsonObject expenses = layers.getAsJsonObject("wydatki");
+        JsonArray punkty = expenses.getAsJsonArray("punkty");
+
+        int number = 0;
+        for (JsonElement e : punkty) {
+            JsonObject tuple = e.getAsJsonObject();
+            String title = tuple.getAsJsonPrimitive("tytul").getAsString();
+
+            if (title.equals("Koszty drobnych napraw i remontów lokalu biura poselskiego")) {
+                number = tuple.getAsJsonPrimitive("numer").getAsInt();
+            }
+        }
+        JsonArray roczniki = expenses.getAsJsonArray("roczniki");
+
+        double renovationExpenses = 0;
+        double totalExpenses = 0;
+
+        if (number != 0) {
+            for (JsonElement e : roczniki) {
+                JsonArray pola = e.getAsJsonObject().getAsJsonArray("pola");
+                renovationExpenses += pola.get(number - 1).getAsDouble();
+
+                for (JsonElement p : pola) {
+                    totalExpenses += p.getAsDouble();
+                }
+            }
+        }
+
+        representative.setMinorRenovationExp(renovationExpenses);
+        representative.setTotalExpenses(totalExpenses);
+
+        JsonElement businessTripsEl = layers.get("wyjazdy");
+
+        if (businessTripsEl.isJsonArray()) {
+
+            JsonArray businessTrips = businessTripsEl.getAsJsonArray();
+
+            for(JsonElement e : businessTrips) {
+                JsonObject jsonTrip = e.getAsJsonObject();
+
+                BusinessTrip businessTrip = new BusinessTrip();
+                businessTrip.setCountry(jsonTrip.getAsJsonPrimitive("kraj").getAsString());
+                businessTrip.setDays(jsonTrip.getAsJsonPrimitive("liczba_dni").getAsInt());
+
+                LocalDate since = LocalDate.parse(jsonTrip.getAsJsonPrimitive("od").getAsString());
+                businessTrip.setSince(since);
+
+                LocalDate to = LocalDate.parse(jsonTrip.getAsJsonPrimitive("do").getAsString());
+                businessTrip.setTo(to);
+
+                businessTrip.setTotalExpense(jsonTrip.getAsJsonPrimitive("koszt_suma").getAsDouble());
+
+                representative.addBusinessTrip(businessTrip);
+            }
+        }
+
+        return representative;
+    }
+
+
 
     private BufferedReader getJsonBufferedReaderForId(int id) throws IOException {
         String urlString = new StringBuilder()
