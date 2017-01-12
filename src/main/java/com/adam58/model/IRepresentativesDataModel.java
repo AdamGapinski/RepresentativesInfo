@@ -6,7 +6,7 @@ import java.util.List;
  * @author Adam Gapiński
  */
 public interface IRepresentativesDataModel {
-    Representative getRep(String name);
+    Representative getRepresentative(String name, String surname);
     Representative getRepMostTrips(int termOfOffice);
     Representative getRepLongestTripsResidency(int termOfOffice);
     Representative getRepMostExpensiveTrip(int termOfOffice);

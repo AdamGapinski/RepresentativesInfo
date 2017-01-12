@@ -33,17 +33,14 @@ public class FetchRepresentativesFromWebApi implements IFetchRepresentativesData
     }
 
     @Override
-    public Representative fetchRepresentativeByName(int termOfOffice,
-                                                    String names,
+    public Representative fetchRepresentativeByName(String name,
                                                     String surname) throws Exception {
-        String namesUpper = names.toUpperCase();
+        String nameUpper = name.toUpperCase();
         String surnameUpper = surname.toUpperCase();
 
-        List<Representative> representatives = fetchRepsByConditionsAndFilter(termOfOfficeToUrlParameter(termOfOffice),
-                repInfo -> {
-                    return repInfo.names.toUpperCase().equals(namesUpper) &&
-                            repInfo.surname.toUpperCase().equals(surnameUpper);
-                });
+        List<Representative> representatives = fetchRepsByConditionsAndFilter("",
+                repInfo -> repInfo.name.toUpperCase().equals(nameUpper) &&
+                        repInfo.surname.toUpperCase().equals(surnameUpper));
 
         if (representatives.size() == 0) {
             throw new Exception();
@@ -299,7 +296,7 @@ class DataObject {
         public int id;
 
         @SerializedName("poslowie.imiona")
-        public String names;
+        public String name;
 
         @SerializedName("poslowie.nazwisko")
         public String surname;
