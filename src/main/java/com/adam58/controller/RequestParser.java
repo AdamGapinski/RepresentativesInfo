@@ -173,22 +173,21 @@ public class RequestParser implements IRequestParser {
 
         return term;
     }
-
-    static class RequestNotSupported extends RuntimeException {
-        RequestNotSupported(String message) {
-            super(message);
-        }
+}
+class RequestNotSupported extends RuntimeException {
+    RequestNotSupported(String message) {
+        super(message);
     }
+}
 
-    static class InvalidParameter extends RuntimeException {
-        InvalidParameter(String message) {
-            super(message);
-        }
+class InvalidParameter extends RuntimeException {
+    InvalidParameter(String message) {
+        super(message);
     }
+}
 
-    static class NotEnoughArgumentsException extends RuntimeException {
-        NotEnoughArgumentsException(String message) {
-            super(message);
-        }
+class NotEnoughArgumentsException extends RuntimeException {
+    NotEnoughArgumentsException(String message) {
+        super(message);
     }
 }
