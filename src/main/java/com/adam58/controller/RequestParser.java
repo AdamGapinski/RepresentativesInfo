@@ -15,7 +15,7 @@ public class RequestParser implements IRequestParser {
             throw new NotEnoughArgumentsException("Request not specified, run with -help for more info");
         }
 
-        String requestString = args[1];
+        String requestString = args[0];
         requestString = requestString.toUpperCase();
 
         Request request;
