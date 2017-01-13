@@ -16,16 +16,8 @@ public class Representative {
     private double minorRenovationExp;
 
     private List<BusinessTrip> trips = new ArrayList<>();
+    private List<Integer> terms = new ArrayList<>();
 
-    public Representative(){}
-
-    public Representative(RepresentativeDTO representativeDTO) {
-        this.name = representativeDTO.data.name;
-        this.secondName = representativeDTO.data.secondName;
-        this.surname = representativeDTO.data.surname;
-
-        representativeDTO.layers.expenses.punkty.forEach(tuple -> this.totalExpenses += tuple.number);
-    }
 
     @Override
     public String toString() {
@@ -42,6 +34,14 @@ public class Representative {
                         .getCountry()
                         .toLowerCase()
                         .equals(destination.toLowerCase()));
+    }
+
+    public boolean hasRepresentedInTerm(int term) {
+        return terms.contains(term);
+    }
+
+    public void addTerm(int term) {
+        terms.add(term);
     }
 
     public int calculateTotalBusinessTripsResidency() {

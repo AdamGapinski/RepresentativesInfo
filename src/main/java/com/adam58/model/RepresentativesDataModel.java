@@ -1,7 +1,7 @@
 package com.adam58.model;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.BinaryOperator;
 import java.util.stream.Collectors;
 
@@ -9,7 +9,8 @@ import java.util.stream.Collectors;
  * @author Adam Gapiński
  */
 public class RepresentativesDataModel implements IRepresentativesDataModel {
-    private List<Representative> representatives = new CopyOnWriteArrayList<>();
+    private List<Representative> representatives = new ArrayList<>();
+    private List<Integer> fetchedTerms = new ArrayList<>();
     private IFetchRepresentativesData dataProvider = new FetchRepresentativesFromWebApi();
 
 
@@ -55,7 +56,7 @@ public class RepresentativesDataModel implements IRepresentativesDataModel {
 
 
     private Representative getRepMostOf(int termOfOffice, BinaryOperator<Representative> operator) {
-        return dataProvider.fetchRepresentativesByTermOfOffice(termOfOffice)
+        return this.getRepsByTermOfOffice(termOfOffice)
                 .stream()
                 .reduce(operator)
                 .orElseThrow(() -> new RepresentativeNotFoundException(String.format("Representatives not found for " +
@@ -86,12 +87,24 @@ public class RepresentativesDataModel implements IRepresentativesDataModel {
 
     @Override
     public List<Representative> getRepsByTermOfOffice(int termOfOffice) {
-        return dataProvider.fetchRepresentativesByTermOfOffice(termOfOffice);
+        List<Representative> result;
+
+        if (fetchedTerms.contains(termOfOffice)) {
+            result = representatives.stream()
+                    .filter(representative -> representative.hasRepresentedInTerm(termOfOffice))
+                    .collect(Collectors.toList());
+        } else {
+            result = dataProvider.fetchRepresentativesByTermOfOffice(termOfOffice);
+            fetchedTerms.add(termOfOffice);
+            representatives.addAll(result);
+        }
+
+        return result;
     }
 
     @Override
     public List<Representative> getRepsByTripDestination(String destination, int termOfOffice) {
-        return dataProvider.fetchRepresentativesByTermOfOffice(termOfOffice)
+        return this.getRepsByTermOfOffice(termOfOffice)
                 .stream()
                 .filter(representative -> representative.wereOnBusinessTripIn("Włochy"))
                 .collect(Collectors.toList());
