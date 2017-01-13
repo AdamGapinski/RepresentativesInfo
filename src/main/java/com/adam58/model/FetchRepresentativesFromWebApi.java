@@ -8,7 +8,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -39,8 +38,29 @@ public class FetchRepresentativesFromWebApi implements IFetchRepresentativesData
         String surnameUpper = surname.toUpperCase();
 
         List<Representative> representatives = fetchRepsByConditionsAndFilter("",
-                repInfo -> repInfo.name.toUpperCase().equals(nameUpper) &&
-                        repInfo.surname.toUpperCase().equals(surnameUpper));
+                repInfo -> repInfo.data.name.toUpperCase().equals(nameUpper) &&
+                        repInfo.data.surname.toUpperCase().equals(surnameUpper) &&
+                        (repInfo.data.secondName == null || repInfo.data.secondName.equals("")));
+
+        if (representatives.size() == 0) {
+            throw new Exception();
+        }
+
+        return representatives.get(0);
+    }
+
+    @Override
+    public Representative fetchRepresentativeByName(String name,
+                                                    String secondName,
+                                                    String surname) throws Exception {
+        String nameUpper = name.toUpperCase();
+        String surnameUpper = surname.toUpperCase();
+        String secondNameUpper = secondName.toUpperCase();
+
+        List<Representative> representatives = fetchRepsByConditionsAndFilter("",
+                repInfo -> repInfo.data.name.toUpperCase().equals(nameUpper) &&
+                        repInfo.data.surname.toUpperCase().equals(surnameUpper) &&
+                        repInfo.data.secondName.toUpperCase().equals(secondNameUpper));
 
         if (representatives.size() == 0) {
             throw new Exception();
@@ -64,9 +84,11 @@ public class FetchRepresentativesFromWebApi implements IFetchRepresentativesData
                 Gson gson = new Gson();
 
                 String line;
+
                 while ((line = reader.readLine()) != null) {
 
                     DataObject dto = gson.fromJson(line, DataObject.class);
+
                     if (dto != null) {
                         representatives.addAll(parallelRequestIds(dto.Dataobject
                                 .stream()
@@ -144,11 +166,9 @@ public class FetchRepresentativesFromWebApi implements IFetchRepresentativesData
         JsonObject data = jsonObject.getAsJsonObject("data");
         representative.setName(data.getAsJsonPrimitive("poslowie.imie_pierwsze").getAsString());
         representative.setSecondName(data.getAsJsonPrimitive("poslowie.imie_drugie").getAsString());
-        representative.setNames(data.getAsJsonPrimitive("poslowie.imiona").getAsString());
         representative.setSurname(data.getAsJsonPrimitive("poslowie.nazwisko").getAsString());
-        representative.setBusinessTripsCount(data.getAsJsonPrimitive("poslowie.liczba_wyjazdow").getAsInt());
-        representative.setTotalBusinessTripsExpense(data.getAsJsonPrimitive("poslowie.wartosc_wyjazdow")
-                .getAsDouble());
+        representative.setNameDopelniacz(data.getAsJsonPrimitive("poslowie.dopelniacz").getAsString());
+
 
 
         List<Integer> termsOfOffice = new ArrayList<>();
@@ -156,8 +176,6 @@ public class FetchRepresentativesFromWebApi implements IFetchRepresentativesData
         for (JsonElement e : data.getAsJsonArray("poslowie.kadencja")) {
             termsOfOffice.add(e.getAsInt());
         }
-
-        representative.setTermsOfOffice(termsOfOffice);
 
         JsonObject layers = jsonObject.getAsJsonObject("layers");
         JsonObject expenses = layers.getAsJsonObject("wydatki");
@@ -204,12 +222,6 @@ public class FetchRepresentativesFromWebApi implements IFetchRepresentativesData
                 businessTrip.setCountry(jsonTrip.getAsJsonPrimitive("kraj").getAsString());
                 businessTrip.setDays(jsonTrip.getAsJsonPrimitive("liczba_dni").getAsInt());
 
-                LocalDate since = LocalDate.parse(jsonTrip.getAsJsonPrimitive("od").getAsString());
-                businessTrip.setSince(since);
-
-                LocalDate to = LocalDate.parse(jsonTrip.getAsJsonPrimitive("do").getAsString());
-                businessTrip.setTo(to);
-
                 businessTrip.setTotalExpense(jsonTrip.getAsJsonPrimitive("koszt_suma").getAsDouble());
 
                 representative.addBusinessTrip(businessTrip);
@@ -218,7 +230,6 @@ public class FetchRepresentativesFromWebApi implements IFetchRepresentativesData
 
         return representative;
     }
-
 
 
     private BufferedReader getJsonBufferedReaderForId(int id) throws IOException {
@@ -252,12 +263,6 @@ class RepresentativeDTO {
 
         @SerializedName("poslowie.nazwisko")
         public String surname;
-
-        @SerializedName("poslowie.imiona")
-        public String names;
-
-        @SerializedName("poslowie.kadencja")
-        public List<Integer> termOfOffice;
     }
 
     @SerializedName("data")
@@ -274,14 +279,6 @@ class RepresentativeDTO {
 
             public List<Punkt> punkty;
 
-            class Value {
-                @SerializedName("pola")
-                List<Integer> values;
-            }
-
-            @SerializedName("roczniki")
-            public List<Value> values;
-
         }
 
         @SerializedName("wydatki")
@@ -293,13 +290,19 @@ class RepresentativeDTO {
 
 class DataObject {
     class RepresentativeBasicInfo {
+        class Data {
+            @SerializedName("poslowie.imie_pierwsze")
+            public String name;
+
+            @SerializedName("poslowie.imie_drugie")
+            public String secondName;
+
+            @SerializedName("poslowie.nazwisko")
+            public String surname;
+        }
+
         public int id;
-
-        @SerializedName("poslowie.imiona")
-        public String name;
-
-        @SerializedName("poslowie.nazwisko")
-        public String surname;
+        public Data data;
     }
 
     public List<RepresentativeBasicInfo> Dataobject;

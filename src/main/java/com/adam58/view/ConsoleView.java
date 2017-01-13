@@ -1,6 +1,9 @@
 package com.adam58.view;
 
 import com.adam58.model.IRepresentativesDataModel;
+import com.adam58.model.Representative;
+
+import java.util.List;
 
 /**
  * @author Adam Gapiński
@@ -13,37 +16,85 @@ public class ConsoleView implements IConsoleView {
     }
 
     @Override
-    public void printSumOfExpenses(String name, int termOfOffice) {
-
+    public void printSumOfExpenses(String name, String surname) {
+        Representative rep = this.representativesData.getRepresentative(name, surname);
+        System.out.printf("Suma wydatków posła %s wynosi:    %f\n",
+                rep.getNameDopelniacz(),
+                rep.getTotalExpenses());
     }
 
     @Override
-    public void printOfficeRenovationExpenses(String name, int termOfOffice) {
+    public void printOfficeRenovationExpenses(String name, String surname) {
+        Representative rep = representativesData.getRepresentative(name, surname);
 
+        System.out.printf("Suma wydatków posła %s na drobne naprawy i " +
+                        "remonty biura poselskiego wynosi:     %f\n",
+                rep.getNameDopelniacz(),
+                rep.getMinorRenovationExp());
+    }
+
+    @Override
+    public void printSumOfExpenses(String name, String secondName, String surname) {
+        Representative rep = this.representativesData.getRepresentative(name, secondName, surname);
+        System.out.printf("Poseł %s w sumie wydał:    %f\n",
+                rep, rep.getTotalExpenses());
+    }
+
+    @Override
+    public void printOfficeRenovationExpenses(String name, String secondName, String surname) {
+        Representative rep = representativesData.getRepresentative(name, secondName, surname);
+
+        System.out.printf("Poseł %s w sumie wydał na drobne naprawy i " +
+                        "remonty biura poselskiego:     %f\n",
+                rep, rep.getMinorRenovationExp());
     }
 
     @Override
     public void printAverageExpenses(int termOfOffice) {
+        List<Representative> representatives = representativesData.getRepsByTermOfOffice(termOfOffice);
+        double sum = representatives.stream().mapToDouble(Representative::getTotalExpenses).sum();
+        double average = sum / representatives.size();
 
+        System.out.printf("Średnia wydatków posłów w %d. kadencji wynosi:     %.2f\n", termOfOffice,
+                average);
     }
 
     @Override
     public void printMostBusinessTripsAbroad(int termOfOffice) {
+        Representative rep = representativesData.getRepMostTrips(termOfOffice);
 
+        System.out.printf("Posłem o największej liczbie (%d) podróży zagranicznych " +
+                "w %d. kadencji jest:   %s\n",
+                rep.getBusinessTripsCount(),
+                termOfOffice,
+                rep.toString());
     }
 
     @Override
     public void printLongestAbroadResidence(int termOfOffice) {
+        Representative rep = representativesData.getRepLongestTripsResidency(termOfOffice);
 
+        System.out.printf("Poseł który najdłużej przebywał za granicą (%d dni) to:   %s\n",
+                rep.calculateTotalBusinessTripsResidency(),
+                rep.toString());
     }
 
     @Override
     public void printMostExpensiveTripAbroad(int termOfOffice) {
+        Representative rep = representativesData.getRepMostExpensiveTrip(termOfOffice);
 
+        System.out.printf("Poseł który odbył najdroższą podróż zagraniczną (%.2f PLN) to:     %s\n",
+                rep.calculateMostExpensiveTripPrice(),
+                rep.toString());
     }
 
     @Override
     public void printVisitedItaly(int termOfOffice) {
+        System.out.printf("Posłowie, którzy w %d. kadencji odwiedzili Włochy: \n\n", termOfOffice);
 
+        representativesData.getRepsByTripDestination("Włochy", termOfOffice)
+                .forEach(System.out::println);
+
+        System.out.println();
     }
 }
