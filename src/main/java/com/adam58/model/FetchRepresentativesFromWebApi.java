@@ -33,7 +33,7 @@ public class FetchRepresentativesFromWebApi implements IFetchRepresentativesData
 
     @Override
     public Representative fetchRepresentativeByName(String name,
-                                                    String surname) throws Exception {
+                                                    String surname) {
         String nameUpper = name.toUpperCase();
         String surnameUpper = surname.toUpperCase();
 
@@ -43,16 +43,17 @@ public class FetchRepresentativesFromWebApi implements IFetchRepresentativesData
                         (repInfo.data.secondName == null || repInfo.data.secondName.equals("")));
 
         if (representatives.size() == 0) {
-            throw new Exception();
+            throw new RepresentativeNotFoundException(String.format("Representative for given name: %s %s not found",
+                    name, surname));
+        } else {
+            return representatives.get(0);
         }
-
-        return representatives.get(0);
     }
 
     @Override
     public Representative fetchRepresentativeByName(String name,
                                                     String secondName,
-                                                    String surname) throws Exception {
+                                                    String surname) {
         String nameUpper = name.toUpperCase();
         String surnameUpper = surname.toUpperCase();
         String secondNameUpper = secondName.toUpperCase();
@@ -63,7 +64,8 @@ public class FetchRepresentativesFromWebApi implements IFetchRepresentativesData
                         repInfo.data.secondName.toUpperCase().equals(secondNameUpper));
 
         if (representatives.size() == 0) {
-            throw new Exception();
+            throw new RepresentativeNotFoundException(String.format("Representative for given name: %s %s %s not found",
+                    name, secondName, surname));
         }
 
         return representatives.get(0);
@@ -71,8 +73,7 @@ public class FetchRepresentativesFromWebApi implements IFetchRepresentativesData
 
     private List<Representative> fetchRepsByConditionsAndFilter(
             String conditions,
-            Predicate<? super DataObject.RepresentativeBasicInfo> filter) {
-        ExecutorService servicePageRequest = Executors.newCachedThreadPool();
+            Predicate<? super JsonDataObject.RepresentativeBasicInfo> filter) {
         List<Representative> representatives = new CopyOnWriteArrayList<>();
 
 
@@ -87,7 +88,7 @@ public class FetchRepresentativesFromWebApi implements IFetchRepresentativesData
 
                 while ((line = reader.readLine()) != null) {
 
-                    DataObject dto = gson.fromJson(line, DataObject.class);
+                    JsonDataObject dto = gson.fromJson(line, JsonDataObject.class);
 
                     if (dto != null) {
                         representatives.addAll(parallelRequestIds(dto.Dataobject
@@ -103,8 +104,6 @@ public class FetchRepresentativesFromWebApi implements IFetchRepresentativesData
                 e.printStackTrace();
             }
         });
-
-        waitForExecutorServices(servicePageRequest);
 
         return representatives;
     }
@@ -169,7 +168,9 @@ public class FetchRepresentativesFromWebApi implements IFetchRepresentativesData
         representative.setSurname(data.getAsJsonPrimitive("poslowie.nazwisko").getAsString());
         representative.setNameDopelniacz(data.getAsJsonPrimitive("poslowie.dopelniacz").getAsString());
 
-
+        for(JsonElement termJson : data.getAsJsonArray("poslowie.kadencja")) {
+            representative.addTerm(termJson.getAsInt());
+        }
 
         List<Integer> termsOfOffice = new ArrayList<>();
 
@@ -253,42 +254,7 @@ public class FetchRepresentativesFromWebApi implements IFetchRepresentativesData
     }
 }
 
-class RepresentativeDTO {
-    class Data {
-        @SerializedName("poslowie.imie_pierwsze")
-        public String name;
-
-        @SerializedName("poslowie.imie_drugie")
-        public String secondName;
-
-        @SerializedName("poslowie.nazwisko")
-        public String surname;
-    }
-
-    @SerializedName("data")
-    public Data data;
-
-    class Layers {
-        class Expenses {
-            class Punkt {
-                @SerializedName("tytul")
-                public String title;
-                @SerializedName("numer")
-                public int number;
-            }
-
-            public List<Punkt> punkty;
-
-        }
-
-        @SerializedName("wydatki")
-        public Expenses expenses;
-    }
-
-    public Layers layers;
-}
-
-class DataObject {
+class JsonDataObject {
     class RepresentativeBasicInfo {
         class Data {
             @SerializedName("poslowie.imie_pierwsze")

@@ -1,8 +1,6 @@
 package com.adam58.controller;
 
-import com.adam58.controller.RequestParser.InvalidParameter;
-import com.adam58.controller.RequestParser.NotEnoughArgumentsException;
-import com.adam58.controller.RequestParser.RequestNotSupported;
+import com.adam58.model.RepresentativeNotFoundException;
 import com.adam58.model.RepresentativesDataModel;
 import com.adam58.view.ConsoleView;
 import com.adam58.view.IConsoleView;
@@ -32,7 +30,8 @@ public class Controller {
 
         } catch (NotEnoughArgumentsException |
                 InvalidParameter |
-                RequestNotSupported e){
+                RequestNotSupported |
+                RepresentativeNotFoundException e){
             System.out.println(e.getMessage());
         } catch (Exception e) {
             System.out.println("Something went wrong.");
