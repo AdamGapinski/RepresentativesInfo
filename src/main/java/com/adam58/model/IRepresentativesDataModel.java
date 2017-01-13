@@ -7,6 +7,7 @@ import java.util.List;
  */
 public interface IRepresentativesDataModel {
     Representative getRepresentative(String name, String surname);
+    Representative getRepresentative(String name, String secondName, String surname);
     Representative getRepMostTrips(int termOfOffice);
     Representative getRepLongestTripsResidency(int termOfOffice);
     Representative getRepMostExpensiveTrip(int termOfOffice);

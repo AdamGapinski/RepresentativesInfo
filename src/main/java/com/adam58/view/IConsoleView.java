@@ -4,8 +4,10 @@ package com.adam58.view;
  * @author Adam Gapiński
  */
 public interface IConsoleView {
-    void printSumOfExpenses(String name, int termOfOffice);
-    void printOfficeRenovationExpenses(String name, int termOfOffice);
+    void printSumOfExpenses(String name, String surname);
+    void printOfficeRenovationExpenses(String name, String surname);
+    void printSumOfExpenses(String name, String secondName, String surname);
+    void printOfficeRenovationExpenses(String name, String secondName, String surname);
     void printAverageExpenses(int termOfOffice);
     void printMostBusinessTripsAbroad(int termOfOffice);
     void printLongestAbroadResidence(int termOfOffice);
