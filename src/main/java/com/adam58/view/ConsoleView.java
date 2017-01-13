@@ -3,7 +3,10 @@ package com.adam58.view;
 import com.adam58.model.IRepresentativesDataModel;
 import com.adam58.model.Representative;
 
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.util.List;
+import java.util.Scanner;
 
 /**
  * @author Adam Gapiński
@@ -18,7 +21,7 @@ public class ConsoleView implements IConsoleView {
     @Override
     public void printSumOfExpenses(String name, String surname) {
         Representative rep = this.representativesData.getRepresentative(name, surname);
-        System.out.printf("Suma wydatków posła %s wynosi:    %f\n",
+        System.out.printf("Suma wydatków posła %s wynosi: %.2f PLN\n",
                 rep.getNameDopelniacz(),
                 rep.getTotalExpenses());
     }
@@ -28,7 +31,7 @@ public class ConsoleView implements IConsoleView {
         Representative rep = representativesData.getRepresentative(name, surname);
 
         System.out.printf("Suma wydatków posła %s na drobne naprawy i " +
-                        "remonty biura poselskiego wynosi:     %f\n",
+                        "remonty biura poselskiego wynosi: %.2f PLN\n",
                 rep.getNameDopelniacz(),
                 rep.getMinorRenovationExp());
     }
@@ -36,7 +39,7 @@ public class ConsoleView implements IConsoleView {
     @Override
     public void printSumOfExpenses(String name, String secondName, String surname) {
         Representative rep = this.representativesData.getRepresentative(name, secondName, surname);
-        System.out.printf("Poseł %s w sumie wydał:    %f\n",
+        System.out.printf("Poseł %s w sumie wydał: %.2f PLN\n",
                 rep, rep.getTotalExpenses());
     }
 
@@ -45,7 +48,7 @@ public class ConsoleView implements IConsoleView {
         Representative rep = representativesData.getRepresentative(name, secondName, surname);
 
         System.out.printf("Poseł %s w sumie wydał na drobne naprawy i " +
-                        "remonty biura poselskiego:     %f\n",
+                        "remonty biura poselskiego: %.2f PLN\n",
                 rep, rep.getMinorRenovationExp());
     }
 
@@ -55,7 +58,7 @@ public class ConsoleView implements IConsoleView {
         double sum = representatives.stream().mapToDouble(Representative::getTotalExpenses).sum();
         double average = sum / representatives.size();
 
-        System.out.printf("Średnia wydatków posłów w %d. kadencji wynosi:     %.2f\n", termOfOffice,
+        System.out.printf("Średnia wydatków posłów w %d. kadencji wynosi: %.2f PLN\n", termOfOffice,
                 average);
     }
 
@@ -64,7 +67,7 @@ public class ConsoleView implements IConsoleView {
         Representative rep = representativesData.getRepMostTrips(termOfOffice);
 
         System.out.printf("Posłem o największej liczbie (%d) podróży zagranicznych " +
-                "w %d. kadencji jest:   %s\n",
+                "w %d. kadencji jest: %s\n",
                 rep.getBusinessTripsCount(),
                 termOfOffice,
                 rep.toString());
@@ -74,7 +77,7 @@ public class ConsoleView implements IConsoleView {
     public void printLongestAbroadResidence(int termOfOffice) {
         Representative rep = representativesData.getRepLongestTripsResidency(termOfOffice);
 
-        System.out.printf("Poseł który najdłużej przebywał za granicą (%d dni) to:   %s\n",
+        System.out.printf("Poseł który najdłużej przebywał za granicą (%d dni) to: %s\n",
                 rep.calculateTotalBusinessTripsResidency(),
                 rep.toString());
     }
@@ -83,7 +86,7 @@ public class ConsoleView implements IConsoleView {
     public void printMostExpensiveTripAbroad(int termOfOffice) {
         Representative rep = representativesData.getRepMostExpensiveTrip(termOfOffice);
 
-        System.out.printf("Poseł który odbył najdroższą podróż zagraniczną (%.2f PLN) to:     %s\n",
+        System.out.printf("Poseł który odbył najdroższą podróż zagraniczną (%.2f PLN) to: %s\n",
                 rep.calculateMostExpensiveTripPrice(),
                 rep.toString());
     }
@@ -96,5 +99,16 @@ public class ConsoleView implements IConsoleView {
                 .forEach(System.out::println);
 
         System.out.println();
+    }
+
+    @Override
+    public void printHelp() {
+        try (Scanner scanner = new Scanner(new FileReader("help"))) {
+            while (scanner.hasNextLine()) {
+                System.out.println(scanner.nextLine());
+            }
+        } catch (FileNotFoundException e) {
+            System.out.println("something went wrong and help is not accessible.");
+        }
     }
 }

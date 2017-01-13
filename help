@@ -1,9 +1,15 @@
 Obsługiwane argumenty lini poleceń
 
--k 8 określenie kadencji sejmu
-    -n "Piotr Paweł Bauć"   imię i nazwisko posła
+-help
+
+-n "Piotr Paweł Bauć"   imię i nazwisko posła
         -wyd-sum                suma wydatków posła/posłanki o określonym imieniu i nazwisku
         -wyd-dr                 wysokości wydatków na 'drobne naprawy i remonty biura poselskiego' określonego posła/posłanki
+
+        Brak trzeciego argumentu oznacza wypisanie wszystkich powyższych informacji.
+
+-k 8 określenie kadencji sejmu
+
     -wyd-sr                 średnia wartość sumy wydatków wszystkich posłów
     -naj-podr               poseł/posłanka który wykonał najwięcej podróży zagranicznych
     -naj-dl                 poseł/posłanka który najdłużej przebywał za granicą

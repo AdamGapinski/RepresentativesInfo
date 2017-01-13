@@ -13,4 +13,5 @@ public interface IConsoleView {
     void printLongestAbroadResidence(int termOfOffice);
     void printMostExpensiveTripAbroad(int termOfOffice);
     void printVisitedItaly(int termOfOffice);
+    void printHelp();
 }
