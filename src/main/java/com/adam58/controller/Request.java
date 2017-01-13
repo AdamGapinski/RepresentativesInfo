@@ -3,14 +3,14 @@ package com.adam58.controller;
 /**
  * @author Adam Gapiński
  */
-public class Request {
-    private int termOfOffice;
+public enum Request {
+    SINGLE_REP_INFO, REPRESENTATIVES_INFO, HELP;
 
-    public Request(int termOfOffice) {
-        this.termOfOffice = termOfOffice;
+    public enum SingleRepInfo {
+        TOTAL_EXPENSES, MINOR_RENOVATION_EXPENSES, ALL
     }
 
-    public int getTermOfOffice() {
-        return termOfOffice;
+    public enum RepresentativeInfo {
+        AVERAGE_EXP, MOST_EXP_TRIP, LONGEST_ON_TRIP, MOST_TRIPS, VISITED_ITALY, ALL
     }
 }
