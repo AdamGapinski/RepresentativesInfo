@@ -83,20 +83,19 @@ public class RequestParser implements IRequestParser {
         }
 
         switch (stringRequest.toLowerCase()) {
-            case "-wyd-sr":
+            case "-srednia":
                 request = RepresentativeInfo.AVERAGE_EXP;
                 break;
-            case "-naj-podr":
+            case "-najwiecej":
                 request = RepresentativeInfo.MOST_TRIPS;
                 break;
-            case "-naj-dl":
+            case "-najdluzej":
                 request = RepresentativeInfo.LONGEST_ON_TRIP;
                 break;
-
-            case "-naj-dr":
+            case "-najdrozej":
                 request = RepresentativeInfo.MOST_EXP_TRIP;
                 break;
-            case "-wl":
+            case "-wlochy":
                 request = RepresentativeInfo.VISITED_ITALY;
                 break;
             default:
@@ -120,10 +119,10 @@ public class RequestParser implements IRequestParser {
         }
 
         switch (stringRequest.toLowerCase()) {
-            case "-wyd-sum":
+            case "-suma":
                 request = SingleRepInfo.TOTAL_EXPENSES;
                 break;
-            case "-wyd-dr":
+            case "-drobne":
                 request = SingleRepInfo.MINOR_RENOVATION_EXPENSES;
                 break;
             default:
