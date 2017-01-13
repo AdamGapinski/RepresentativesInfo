@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 public class RepresentativesDataModel implements IRepresentativesDataModel {
     private List<Representative> representatives = new ArrayList<>();
     private List<Integer> fetchedTerms = new ArrayList<>();
-    private IFetchRepresentativesData dataProvider = new FetchRepresentativesFromWebApi();
+    private WebApiRequester dataProvider = new ParallelWebApiRequester();
 
 
     @Override

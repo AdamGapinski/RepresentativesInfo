@@ -5,7 +5,7 @@ import java.util.List;
 /**
  * @author Adam Gapiński
  */
-public interface IFetchRepresentativesData {
+public interface WebApiRequester {
     List<Representative> fetchRepresentativesByTermOfOffice(int termOfOffice);
     Representative fetchRepresentativeByName(String name, String surname)
             throws RepresentativeNotFoundException;

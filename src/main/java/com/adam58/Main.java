@@ -7,6 +7,7 @@ import com.adam58.controller.Controller;
  */
 public class Main {
     public static void main(String[] args) {
-        new Controller().handleUserRequest(args);
+        Controller controller = new Controller();
+        controller.handleUserRequest(args);
     }
 }
