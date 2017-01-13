@@ -46,6 +46,28 @@ public class MainTest {
         }
     }
 
+    @Test
+    public void testInvalidCommandLineArguments () {
+        String tableOfArgs[][] = new String[][] {
+                    //lack of representative name
+                {"-n", "-drobne"},
+                    //lack of request parameter -k or -n
+                {"-suma", "Elżbieta Barbara Wite"},
+                    //should start with -n
+                {"-k", "Krzysztof Brejza", "-suma"},
+                    //lack of term of office after -k parameter
+                {"-k", "-srednia"},
+                    //this representative does not exist, should be not found
+                {"-n", "Renata Celina"},
+                    //lack of hyphen before drobne so it will be treated as a name until end of line and not found
+                {"-n", "drobne","Renata Celina Butryn"}
+        };
+
+        for (String[] args : tableOfArgs) {
+            controller.handleUserRequest(args);
+        }
+    }
+
 
     @Test
     public void testRepresentativesInfo() {

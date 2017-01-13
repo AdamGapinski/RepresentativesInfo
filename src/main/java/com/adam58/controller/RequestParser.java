@@ -12,7 +12,7 @@ public class RequestParser implements IRequestParser {
     @Override
     public Request parseRequest(String[] args) {
         if (args.length < 1) {
-            throw new NotEnoughArgumentsException("Request not specified, run with -help for more info");
+            throw new NotEnoughArgumentsException("Request not specified.");
         }
 
         String requestString = args[0];
@@ -30,7 +30,7 @@ public class RequestParser implements IRequestParser {
                 request = REPRESENTATIVES_INFO;
                 break;
             default:
-                throw new RequestNotSupported("Request not supported, run with -help for more info");
+                throw new RequestNotSupported("Request not supported.");
         }
 
         return request;
@@ -64,7 +64,7 @@ public class RequestParser implements IRequestParser {
         try {
             number = Integer.valueOf(stringNumber);
         } catch (NumberFormatException e) {
-            throw new IllegalArgumentException(String.format("%s is not valid %s number", stringNumber, description));
+            throw new InvalidParameter(String.format("%s is not valid %s number", stringNumber, description));
         }
 
         return number;
@@ -144,8 +144,9 @@ public class RequestParser implements IRequestParser {
         }
 
         String result = resultBuilder.toString().trim();
-
-        if (result.split(" ").length < 2) {
+        if (result.length() == 0) {
+            throw new InvalidParameter("Representative name not specified.");
+        } else if (result.split(" ").length < 2) {
             throw new InvalidParameter(String.format("Given name: %s is too short", result));
         } else if (result.split(" ").length > 3) {
             throw new InvalidParameter(String.format("Given name: %s is too long", result));
@@ -167,7 +168,7 @@ public class RequestParser implements IRequestParser {
         }
 
         if (!found) {
-            throw new NotEnoughArgumentsException("Term number not specified, run with -help for more info");
+            throw new NotEnoughArgumentsException("Term number not specified.");
         }
 
         return term;

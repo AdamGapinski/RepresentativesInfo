@@ -30,11 +30,14 @@ public class Controller {
 
         } catch (NotEnoughArgumentsException |
                 InvalidParameter |
-                RequestNotSupported |
-                RepresentativeNotFoundException e){
+                RequestNotSupported e){
+            System.out.println(e.getMessage());
+            System.out.println("Run with -help parameter for more info");
+        } catch (RepresentativeNotFoundException e){
             System.out.println(e.getMessage());
         } catch (Exception e) {
             System.out.println("Something went wrong.");
+            System.out.println("Run with -help parameter for more info");
         }
     }
 
