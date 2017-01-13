@@ -2,6 +2,7 @@ package com.adam58.view;
 
 import com.adam58.model.IRepresentativesDataModel;
 import com.adam58.model.Representative;
+import com.adam58.model.RepresentativeNotFoundException;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -56,8 +57,13 @@ public class ConsoleView implements IConsoleView {
     public void printAverageExpenses(int termOfOffice) {
         List<Representative> representatives = representativesData.getRepsByTermOfOffice(termOfOffice);
         double sum = representatives.stream().mapToDouble(Representative::getTotalExpenses).sum();
-        double average = sum / representatives.size();
+        double average = 0;
 
+        if (representatives.size() == 0) {
+            throw new RepresentativeNotFoundException("No representatives were found for given term: " + termOfOffice);
+        }
+
+        average = sum / representatives.size();
         System.out.printf("Średnia wydatków posłów w %d. kadencji wynosi: %.2f PLN\n", termOfOffice,
                 average);
     }

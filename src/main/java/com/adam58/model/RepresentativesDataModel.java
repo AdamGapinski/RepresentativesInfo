@@ -9,30 +9,48 @@ import java.util.stream.Collectors;
  * @author Adam Gapiński
  */
 public class RepresentativesDataModel implements IRepresentativesDataModel {
-    List<Representative> representatives = new CopyOnWriteArrayList<>();
-    IFetchRepresentativesData dataProvider = new FetchRepresentativesFromWebApi();
+    private List<Representative> representatives = new CopyOnWriteArrayList<>();
+    private IFetchRepresentativesData dataProvider = new FetchRepresentativesFromWebApi();
 
 
     @Override
     public Representative getRepresentative(String name, String surname) {
-        try {
-            return dataProvider.fetchRepresentativeByName(name, surname);
-        } catch (Exception e) {
-            e.printStackTrace();
+        Representative result;
+
+        List<Representative> resultList = representatives.stream().filter(representative ->
+                representative.getName().toLowerCase().equals(name.toLowerCase()) &&
+                        representative.getSurname().toLowerCase().equals(surname.toLowerCase()) &&
+                        representative.getSecondName() == null)
+                .collect(Collectors.toList());
+
+        if (resultList.size() == 0) {
+            result = dataProvider.fetchRepresentativeByName(name, surname);
+            representatives.add(result);
+        } else {
+            result = resultList.get(0);
         }
 
-        return null;
+        return result;
     }
 
     @Override
     public Representative getRepresentative(String name, String secondName, String surname) {
-        try {
-            return dataProvider.fetchRepresentativeByName(name, secondName, surname);
-        } catch (Exception e) {
-            e.printStackTrace();
+        Representative result;
+
+        List<Representative> resultList = representatives.stream().filter(representative ->
+                representative.getName().toLowerCase().equals(name.toLowerCase()) &&
+                        representative.getSurname().toLowerCase().equals(surname.toLowerCase()) &&
+                        representative.getSecondName().toLowerCase().equals(secondName.toLowerCase()))
+                .collect(Collectors.toList());
+
+        if (resultList.size() == 0) {
+            result = dataProvider.fetchRepresentativeByName(name, secondName, surname);
+            representatives.add(result);
+        } else {
+            result = resultList.get(0);
         }
 
-        return null;
+        return result;
     }
 
 
@@ -40,7 +58,8 @@ public class RepresentativesDataModel implements IRepresentativesDataModel {
         return dataProvider.fetchRepresentativesByTermOfOffice(termOfOffice)
                 .stream()
                 .reduce(operator)
-                .get();
+                .orElseThrow(() -> new RepresentativeNotFoundException(String.format("Representatives not found for " +
+                        "given term: %d", termOfOffice)));
     }
 
     @Override
@@ -72,7 +91,6 @@ public class RepresentativesDataModel implements IRepresentativesDataModel {
 
     @Override
     public List<Representative> getRepsByTripDestination(String destination, int termOfOffice) {
-
         return dataProvider.fetchRepresentativesByTermOfOffice(termOfOffice)
                 .stream()
                 .filter(representative -> representative.wereOnBusinessTripIn("Włochy"))
